@@ -19,7 +19,7 @@ import (
 	"github.com/google/gopacket/tcpassembly"
 	"github.com/google/gopacket/tcpassembly/tcpreader"
 	"github.com/quipo/statsd"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 /*
@@ -29,8 +29,8 @@ Structs and helper functions
 */
 
 /*
-  struct for DNS connection table entry
-  the 'inserted' value is used in connection table cleanup
+struct for DNS connection table entry
+the 'inserted' value is used in connection table cleanup
 */
 type dnsMapEntry struct {
 	entry    layers.DNS
@@ -38,7 +38,7 @@ type dnsMapEntry struct {
 }
 
 /*
-  struct for DNS connection table
+struct for DNS connection table
 */
 type connectionTable struct {
 	connections map[string]dnsMapEntry
@@ -46,7 +46,7 @@ type connectionTable struct {
 }
 
 /*
-  struct to store reassembled TCP streams
+struct to store reassembled TCP streams
 */
 type tcpDataStruct struct {
 	DnsData []byte
@@ -55,8 +55,8 @@ type tcpDataStruct struct {
 }
 
 /*
-  global channel to recieve reassembled TCP streams
-  consumed in doCapture
+global channel to recieve reassembled TCP streams
+consumed in doCapture
 */
 var reassembleChan chan tcpDataStruct
 
@@ -72,7 +72,7 @@ type dnsStream struct {
 }
 
 /*
-  create constant for the packetQueue as this is used in multiple places.
+create constant for the packetQueue as this is used in multiple places.
 */
 const packetQueue int = 500
 
@@ -127,8 +127,8 @@ func (d *dnsStream) run() {
 }
 
 /*
-	takes the src IP, dst IP, DNS question, DNS reply and the logs struct to populate.
-	returns nothing, but populates the logs array
+takes the src IP, dst IP, DNS question, DNS reply and the logs struct to populate.
+returns nothing, but populates the logs array
 */
 func initLogEntry(
 	syslogPriority string,
@@ -217,8 +217,8 @@ func initLogEntry(
 }
 
 /*
-	background task to clear out stale entries in the conntable
-	takes a pointer to the conntable to clean, the maximum age of an entry and how often to run GC
+background task to clear out stale entries in the conntable
+takes a pointer to the conntable to clean, the maximum age of an entry and how often to run GC
 */
 func cleanDnsCache(
 	conntable *connectionTable,
@@ -320,10 +320,12 @@ func handleDns(
 	}
 }
 
-/* validate if DNS packet, make conntable entry and output
-   to log channel if there is a match
+/*
+validate if DNS packet, make conntable entry and output
 
-   we pass packet by value here because we turned on ZeroCopy for the capture, which reuses the capture buffer
+	to log channel if there is a match
+
+	we pass packet by value here because we turned on ZeroCopy for the capture, which reuses the capture buffer
 */
 func handlePacket(
 	conntable *connectionTable,
@@ -428,7 +430,7 @@ func handlePacket(
 	}
 }
 
-//setup a device or pcap file for capture, returns a handle
+// setup a device or pcap file for capture, returns a handle
 func initHandle(config *pdnsConfig) *pcap.Handle {
 
 	var handle *pcap.Handle
@@ -460,7 +462,7 @@ func initHandle(config *pdnsConfig) *pcap.Handle {
 	return handle
 }
 
-//kick off packet procesing threads and start the packet capture loop
+// kick off packet procesing threads and start the packet capture loop
 func doCapture(
 	handle *pcap.Handle,
 	logChan chan dnsLogEntry,
@@ -587,8 +589,8 @@ CAPTURE:
 	gracefulShutdown(channels, reChan, logChan)
 }
 
-//If we shut down without doing this stuff, we will lose some of the packet data
-//still in the processing pipeline.
+// If we shut down without doing this stuff, we will lose some of the packet data
+// still in the processing pipeline.
 func gracefulShutdown(channels []chan *packetData,
 	reChan chan tcpDataStruct,
 	logChan chan dnsLogEntry) {

@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/pquerna/ffjson/ffjson"
 	"github.com/quipo/statsd"
+	log "github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
@@ -105,20 +105,20 @@ type dnsLogEntry struct {
 
 // codebeat:enable[TOO_MANY_IVARS]
 
-//private, idempotent function that ensures the json is encoded
+// private, idempotent function that ensures the json is encoded
 func (dle *dnsLogEntry) ensureEncoded() {
 	if dle.encoded == nil && dle.err == nil {
 		dle.encoded, dle.err = ffjson.Marshal(dle)
 	}
 }
 
-//returns length of the encoded JSON
+// returns length of the encoded JSON
 func (dle *dnsLogEntry) Size() int {
 	dle.ensureEncoded()
 	return len(dle.encoded)
 }
 
-//public method to encode the string
+// public method to encode the string
 func (dle *dnsLogEntry) Encode() ([]byte, error) {
 	dle.ensureEncoded()
 	return dle.encoded, dle.err
@@ -149,7 +149,7 @@ func watchLogStats(stats *statsd.StatsdBuffer, logC chan dnsLogEntry, logs []cha
 	}
 }
 
-//Spin up required logging threads and then round-robin log messages to log sinks
+// Spin up required logging threads and then round-robin log messages to log sinks
 func logConn(logC chan dnsLogEntry, opts *logOptions, stats *statsd.StatsdBuffer) {
 
 	//holds the channels for the outgoing log channels
@@ -209,7 +209,7 @@ func logConn(logC chan dnsLogEntry, opts *logOptions, stats *statsd.StatsdBuffer
 	return
 }
 
-//logs to stdout
+// logs to stdout
 func logConnStdout(logC chan dnsLogEntry) {
 	for message := range logC {
 		encoded, _ := message.Encode()
@@ -217,7 +217,7 @@ func logConnStdout(logC chan dnsLogEntry) {
 	}
 }
 
-//logs to a file
+// logs to a file
 func logConnFile(logC chan dnsLogEntry, opts *logOptions) {
 
 	logger := &lumberjack.Logger{
@@ -237,7 +237,7 @@ func logConnFile(logC chan dnsLogEntry, opts *logOptions) {
 
 }
 
-//logs to kafka
+// logs to kafka
 func logConnKafka(logC chan dnsLogEntry, opts *logOptions) {
 	for message := range logC {
 		encoded, _ := message.Encode()
@@ -246,7 +246,7 @@ func logConnKafka(logC chan dnsLogEntry, opts *logOptions) {
 	}
 }
 
-//logs to syslog
+// logs to syslog
 func logConnSyslog(logC chan dnsLogEntry, opts *logOptions) {
 
 	level, err := levelToType(opts.SyslogPriority)
@@ -269,7 +269,7 @@ func logConnSyslog(logC chan dnsLogEntry, opts *logOptions) {
 	}
 }
 
-//logs to fluentd via a unix socket
+// logs to fluentd via a unix socket
 func logConnFluentd(logC chan dnsLogEntry, opts *logOptions) {
 	Tag := opts.SensorName + ".service"
 	tag, _ := msgpack.Marshal(Tag)

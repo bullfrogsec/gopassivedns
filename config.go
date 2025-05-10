@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // codebeat:disable[TOO_MANY_IVARS]
